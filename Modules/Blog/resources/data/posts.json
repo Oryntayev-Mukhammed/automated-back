@@ -1,0 +1,26 @@
+[
+    {
+        "slug": "platform-launch-lessons",
+        "title": "string",
+        "excerpt": "string",
+        "coverImage": "string",
+        "author": "string",
+        "published_at": "2025-12-08"
+    },
+    {
+        "slug": "b2b-portal-scale",
+        "title": "Scaling a B2B partner portal for telecom",
+        "excerpt": "Designing multi-tenant access, granular roles, and resilient integrations with legacy billing.",
+        "coverImage": "/images/blog/blog_2.jpg",
+        "author": "Automaton Soft",
+        "published_at": "2024-08-01"
+    },
+  {
+    "slug": "logistics-automation",
+    "title": "Event-driven logistics automation",
+    "excerpt": "Using Kafka, Go, and Kubernetes to orchestrate warehouse and line-haul operations in real time.",
+    "coverImage": "/images/blog/blog_3.jpg",
+    "author": "Automaton Soft",
+    "published_at": "2024-06-10"
+  }
+]
