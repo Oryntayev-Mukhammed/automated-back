@@ -51,10 +51,24 @@ class BlogController extends Controller
         $data = $request->validate([
             'slug' => 'nullable|string',
             'title' => 'required|string',
+            'subtitle' => 'nullable|string',
+            'category' => 'nullable|string',
+            'series' => 'nullable|string',
             'excerpt' => 'nullable|string',
-            'coverImage' => 'nullable|string',
+            'content' => 'nullable|string',
+            'cover_image' => 'nullable|string',
+            'og_image' => 'nullable|string',
             'author' => 'nullable|string',
             'published_at' => 'nullable|date',
+            'status' => 'nullable|in:draft,published',
+            'tags' => 'nullable|array',
+            'content_blocks' => 'nullable|array',
+            'reading_time' => 'nullable|integer|min:0',
+            'meta_title' => 'nullable|string',
+            'meta_description' => 'nullable|string',
+            'language' => 'nullable|string',
+            'is_featured' => 'nullable|boolean',
+            'canonical_url' => 'nullable|string',
         ]);
 
         $slug = $data['slug'] ?? Str::slug($data['title'] . '-' . Str::random(4));
@@ -66,6 +80,9 @@ class BlogController extends Controller
         $post = Post::create(array_merge([
             'slug' => $slug,
             'author' => $data['author'] ?? 'Automaton Soft',
+            'status' => $data['status'] ?? 'draft',
+            'language' => $data['language'] ?? 'en',
+            'is_featured' => $data['is_featured'] ?? false,
         ], $data));
 
         return response()->json(['data' => $post], 201);
@@ -79,7 +96,27 @@ class BlogController extends Controller
             return response()->json(['message' => 'Post not found'], 404);
         }
 
-        $payload = $request->only(['title', 'excerpt', 'coverImage', 'author', 'published_at']);
+        $payload = $request->only([
+            'title',
+            'excerpt',
+            'content',
+            'cover_image',
+            'og_image',
+            'author',
+            'published_at',
+            'status',
+            'tags',
+            'content_blocks',
+            'reading_time',
+            'meta_title',
+            'meta_description',
+            'subtitle',
+            'category',
+            'series',
+            'language',
+            'is_featured',
+            'canonical_url',
+        ]);
         $post->fill(array_filter($payload, fn($v) => !is_null($v)));
         $post->save();
 

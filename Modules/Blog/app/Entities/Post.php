@@ -15,8 +15,29 @@ class Post extends Model
         'slug',
         'title',
         'excerpt',
-        'coverImage',
+        'content',
+        'cover_image',
+        'og_image',
         'author',
         'published_at',
+        'status',
+        'tags',
+        'reading_time',
+        'meta_title',
+        'meta_description',
+        'subtitle',
+        'category',
+        'series',
+        'content_blocks',
+        'language',
+        'is_featured',
+        'canonical_url',
+    ];
+
+    protected $casts = [
+        'tags' => 'array',
+        'published_at' => 'datetime',
+        'content_blocks' => 'array',
+        'is_featured' => 'boolean',
     ];
 }

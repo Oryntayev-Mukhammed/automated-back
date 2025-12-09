@@ -13,9 +13,16 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('title');
             $table->text('excerpt')->nullable();
-            $table->string('coverImage')->nullable();
+            $table->longText('content')->nullable();
+            $table->string('cover_image')->nullable();
+            $table->string('og_image')->nullable();
             $table->string('author')->nullable();
-            $table->date('published_at')->nullable();
+            $table->enum('status', ['draft', 'published'])->default('draft');
+            $table->json('tags')->nullable();
+            $table->unsignedInteger('reading_time')->nullable();
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->dateTime('published_at')->nullable();
             $table->timestamps();
         });
     }
