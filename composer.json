@@ -29,7 +29,11 @@
         "Modules\\Case\\": "Modules/Case/app/",
         "Modules\\Blog\\": "Modules/Blog/app/",
         "Modules\\I18n\\": "Modules/I18n/app/"
-    }
+    },
+        "classmap": [
+            "Modules/Case/database/seeders",
+            "Modules/Blog/database/seeders"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

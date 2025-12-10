@@ -4,30 +4,28 @@ namespace Modules\Case\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Orchid\Screen\AsSource;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class CaseModel extends Model
+class CaseTranslation extends Model
 {
     use AsSource;
 
-    protected $table = 'cases';
+    protected $table = 'case_translations';
 
     protected $fillable = [
+        'case_id',
+        'lang',
+        'slug',
         'property_title',
-        'property_img',
         'property_price',
-        'category',
         'location',
         'livingArea',
         'tag',
         'status',
         'type',
-        'slug',
-        'language',
     ];
 
-    public function translations(): HasMany
+    public function case()
     {
-        return $this->hasMany(CaseTranslation::class, 'case_id');
+        return $this->belongsTo(CaseModel::class, 'case_id');
     }
 }

@@ -4,6 +4,7 @@ namespace Modules\Blog\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Orchid\Screen\AsSource;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Post extends Model
 {
@@ -40,4 +41,9 @@ class Post extends Model
         'content_blocks' => 'array',
         'is_featured' => 'boolean',
     ];
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(PostTranslation::class);
+    }
 }

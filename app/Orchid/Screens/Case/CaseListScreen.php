@@ -13,7 +13,7 @@ class CaseListScreen extends Screen
     public function query(): array
     {
         return [
-            'cases' => CaseModel::orderByDesc('updated_at')->paginate(20),
+            'cases' => CaseModel::with('translations')->orderByDesc('updated_at')->paginate(20),
         ];
     }
 
@@ -38,12 +38,17 @@ class CaseListScreen extends Screen
                 protected function columns(): array
                 {
                     return [
-                        TD::make('property_title', 'Title')
-                            ->render(fn (CaseModel $case) => Link::make($case->property_title)
+                        TD::make('title_en', 'Title (en)')
+                            ->render(fn (CaseModel $case) => Link::make(optional($case->translations->firstWhere('lang', 'en'))->property_title ?? $case->property_title ?? '—')
                                 ->route('platform.cases.edit', $case)),
-                        TD::make('language')->filter(TD::FILTER_SELECT, ['en' => 'en', 'de' => 'de']),
+                        TD::make('title_de', 'Title (de)')
+                            ->render(fn (CaseModel $case) => optional($case->translations->firstWhere('lang', 'de'))->property_title ?? '—'),
+                        TD::make('slug', 'Slug (en)')
+                            ->render(fn (CaseModel $case) => optional($case->translations->firstWhere('lang', 'en'))->slug ?? $case->slug ?? '—'),
+                        TD::make('slug_de', 'Slug (de)')
+                            ->render(fn (CaseModel $case) => optional($case->translations->firstWhere('lang', 'de'))->slug ?? '—'),
                         TD::make('category'),
-                        TD::make('location'),
+                        TD::make('type'),
                         TD::make('tag'),
                         TD::make('status'),
                         TD::make('updated_at', 'Updated')
