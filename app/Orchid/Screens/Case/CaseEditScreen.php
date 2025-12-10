@@ -4,7 +4,9 @@ namespace App\Orchid\Screens\Case;
 
 use Modules\Case\Entities\CaseModel;
 use Orchid\Screen\Actions\Button;
+use Orchid\Screen\Fields\Group;
 use Orchid\Screen\Fields\Input;
+use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Alert;
@@ -48,7 +50,14 @@ class CaseEditScreen extends Screen
             Layout::rows([
                 Input::make('case.property_title')->title('Title')->required(),
                 Input::make('case.slug')->title('Slug')->help('If empty, will be generated automatically'),
-                Input::make('case.property_img')->title('Image URL'),
+                Group::make([
+                    Select::make('case.language')
+                        ->title('Language')
+                        ->options(['en' => 'English', 'de' => 'Deutsch'])
+                        ->required()
+                        ->empty('Select language'),
+                    Input::make('case.property_img')->title('Image URL'),
+                ])->autoWidth(),
                 Input::make('case.property_price')->title('Status/Price')->placeholder('In production'),
                 Input::make('case.category')->title('Category'),
                 Input::make('case.type')->title('Type'),
@@ -73,6 +82,7 @@ class CaseEditScreen extends Screen
             'case.status' => 'nullable|string',
             'case.location' => 'nullable|string',
             'case.livingArea' => 'nullable|string',
+            'case.language' => 'required|string|in:en,de',
         ])['case'];
 
         if (empty($data['slug'])) {

@@ -33,6 +33,7 @@ class CaseDatabaseSeeder extends Seeder
                 'status' => $item['status'] ?? null,
                 'type' => $item['type'] ?? null,
                 'slug' => $item['slug'] ?? Str::slug(($item['property_title'] ?? 'case') . '-' . Str::random(4)),
+                'language' => $item['language'] ?? 'en',
                 'created_at' => now(),
                 'updated_at' => now(),
             ];

@@ -22,5 +22,6 @@ class CaseModel extends Model
         'status',
         'type',
         'slug',
+        'language',
     ];
 }

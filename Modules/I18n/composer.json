@@ -1,0 +1,16 @@
+{
+    "name": "nwidart/i18n",
+    "description": "Localization dictionaries module",
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\I18n\\": "app/",
+            "Modules\\I18n\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}

@@ -12,7 +12,8 @@ class BlogController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Post::query();
+        $lang = $this->resolveLanguage($request);
+        $query = Post::query()->where('language', $lang);
 
         if ($search = $request->query('search')) {
             $query->where(function ($q) use ($search) {
@@ -35,9 +36,14 @@ class BlogController extends Controller
         ]);
     }
 
-    public function show(string $slug): JsonResponse
+    public function show(string $slug, Request $request): JsonResponse
     {
-        $item = Post::where('slug', $slug)->first();
+        $lang = $this->resolveLanguage($request);
+        $item = Post::where('slug', $slug)->where('language', $lang)->first();
+
+        if (!$item && $lang !== 'en') {
+            $item = Post::where('slug', $slug)->where('language', 'en')->first();
+        }
 
         if (!$item) {
             return response()->json(['message' => 'Post not found'], 404);
@@ -71,17 +77,18 @@ class BlogController extends Controller
             'canonical_url' => 'nullable|string',
         ]);
 
+        $language = $data['language'] ?? 'en';
         $slug = $data['slug'] ?? Str::slug($data['title'] . '-' . Str::random(4));
 
-        if (Post::where('slug', $slug)->exists()) {
-            return response()->json(['message' => 'Slug already exists'], 422);
+        if (Post::where('slug', $slug)->where('language', $language)->exists()) {
+            return response()->json(['message' => 'Slug already exists for this language'], 422);
         }
 
         $post = Post::create(array_merge([
             'slug' => $slug,
             'author' => $data['author'] ?? 'Automaton Soft',
             'status' => $data['status'] ?? 'draft',
-            'language' => $data['language'] ?? 'en',
+            'language' => $language,
             'is_featured' => $data['is_featured'] ?? false,
         ], $data));
 
@@ -90,7 +97,8 @@ class BlogController extends Controller
 
     public function update(Request $request, string $slug): JsonResponse
     {
-        $post = Post::where('slug', $slug)->first();
+        $lang = $this->resolveLanguage($request);
+        $post = Post::where('slug', $slug)->where('language', $lang)->first();
 
         if (!$post) {
             return response()->json(['message' => 'Post not found'], 404);
@@ -133,5 +141,20 @@ class BlogController extends Controller
 
         $post->delete();
         return response()->json(['message' => 'Post deleted']);
+    }
+
+    private function resolveLanguage(Request $request): string
+    {
+        $lang = $request->query('lang')
+            ?? $request->header('X-Lang')
+            ?? $request->header('Accept-Language');
+
+        if (is_string($lang) && strlen($lang) >= 2) {
+            $lang = substr($lang, 0, 2);
+        } else {
+            $lang = 'en';
+        }
+
+        return in_array($lang, ['en', 'de']) ? $lang : 'en';
     }
 }

@@ -13,7 +13,7 @@ class CaseListScreen extends Screen
     public function query(): array
     {
         return [
-            'cases' => CaseModel::paginate(20),
+            'cases' => CaseModel::orderByDesc('updated_at')->paginate(20),
         ];
     }
 
@@ -41,6 +41,7 @@ class CaseListScreen extends Screen
                         TD::make('property_title', 'Title')
                             ->render(fn (CaseModel $case) => Link::make($case->property_title)
                                 ->route('platform.cases.edit', $case)),
+                        TD::make('language')->filter(TD::FILTER_SELECT, ['en' => 'en', 'de' => 'de']),
                         TD::make('category'),
                         TD::make('location'),
                         TD::make('tag'),

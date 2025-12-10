@@ -13,7 +13,7 @@ class PostListScreen extends Screen
     public function query(): array
     {
         return [
-            'posts' => Post::paginate(20),
+            'posts' => Post::orderByDesc('published_at')->orderByDesc('updated_at')->paginate(20),
         ];
     }
 
@@ -39,13 +39,21 @@ class PostListScreen extends Screen
                 {
                     return [
                         TD::make('title')
+                            ->filter(TD::FILTER_TEXT)
                             ->render(fn (Post $post) => Link::make($post->title)->route('platform.posts.edit', $post)),
-                        TD::make('slug'),
-                        TD::make('author'),
-                        TD::make('status'),
-                        TD::make('cover_image', 'Cover')->render(fn (Post $post) => $post->cover_image
-                            ? Link::make('View')->href($post->cover_image)->target('_blank')
-                            : '—'),
+                        TD::make('slug')->filter(TD::FILTER_TEXT),
+                        TD::make('language')->filter(TD::FILTER_SELECT, ['en' => 'en', 'de' => 'de']),
+                        TD::make('category')->filter(TD::FILTER_TEXT),
+                        TD::make('author')->filter(TD::FILTER_TEXT),
+                        TD::make('status')->filter(TD::FILTER_SELECT, [
+                            'draft' => 'Draft',
+                            'published' => 'Published',
+                        ]),
+                        TD::make('cover_image', 'Cover')->render(function (Post $post) {
+                            return $post->cover_image
+                                ? Link::make('View')->href($post->cover_image)->target('_blank')
+                                : '—';
+                        }),
                         TD::make('published_at')->render(fn (Post $post) => optional($post->published_at)->toDateString()),
                         TD::make('updated_at', 'Updated')->render(fn (Post $post) => optional($post->updated_at)->toDateTimeString()),
                     ];

@@ -4,10 +4,12 @@ namespace App\Orchid\Screens\Blog;
 
 use Modules\Blog\Entities\Post;
 use Orchid\Screen\Actions\Button;
+use Orchid\Screen\Fields\Group;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Switcher;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
+use Orchid\Screen\Fields\Quill;
 use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
@@ -49,12 +51,22 @@ class PostEditScreen extends Screen
                 Input::make('post.author')->title('Author'),
                 Input::make('post.category')->title('Category'),
                 Input::make('post.series')->title('Series'),
-                Input::make('post.cover_image')->title('Cover Image URL')->placeholder('/images/cover.jpg'),
-                Input::make('post.og_image')->title('OG Image URL')->placeholder('/images/cover.jpg'),
-                Select::make('post.status')->title('Status')->options([
-                    'draft' => 'Draft',
-                    'published' => 'Published',
-                ])->empty('Select status'),
+                Group::make([
+                    Select::make('post.language')
+                        ->title('Language')
+                        ->options(['en' => 'English', 'de' => 'Deutsch'])
+                        ->required()
+                        ->empty('Select language'),
+                    Input::make('post.cover_image')->title('Cover Image URL')->placeholder('/images/cover.jpg'),
+                    Input::make('post.og_image')->title('OG Image URL')->placeholder('/images/cover.jpg'),
+                ])->autoWidth(),
+                Select::make('post.status')
+                    ->title('Status')
+                    ->options([
+                        'draft' => 'Draft',
+                        'published' => 'Published',
+                    ])
+                    ->empty('Select status'),
                 Input::make('post.published_at')->type('date')->title('Publish date'),
                 Input::make('post.tags')
                     ->title('Tags')
@@ -63,13 +75,13 @@ class PostEditScreen extends Screen
                     ->value(function ($post) {
                         $tags = $post->tags ?? [];
                         if (is_array($tags)) {
-                            return implode(', ', $tags);
-                        }
-                        return $tags;
-                    }),
+                        return implode(', ', $tags);
+                    }
+                    return $tags;
+                }),
                 Input::make('post.reading_time')->type('number')->min(0)->title('Reading time (minutes)'),
                 TextArea::make('post.excerpt')->title('Excerpt')->rows(3),
-                TextArea::make('post.content')->title('Content')->rows(8),
+                Quill::make('post.content')->title('Content')->popover('Supports rich text; we store markdown/html in the content column.'),
                 Input::make('post.meta_title')->title('Meta title'),
                 TextArea::make('post.meta_description')->title('Meta description')->rows(2),
                 Input::make('post.canonical_url')->title('Canonical URL'),

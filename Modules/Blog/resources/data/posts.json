@@ -161,5 +161,36 @@
     "canonical_url": null,
     "published_at": "2024-11-12T00:00:00Z",
     "author": "Automaton Soft"
+  },
+  {
+    "slug": "observability-from-day-1",
+    "title": "Observability ab Tag 1: sicher liefern",
+    "subtitle": "SLIs, SLOs, Runbooks und kosteneffizientes Monitoring",
+    "category": "platform",
+    "series": "delivery",
+    "content_format": "markdown",
+    "content": "## Warum Observability zuerst\\n- Schnellere MTTR, weniger Regressionen\\n- Gemeinsame Sprache mit dem Business durch SLIs/SLOs\\n- Sichere Releases dank Feature Flags und schnellem Rollback\\n\\n## Stack\\n- Metrics: Prometheus + VictoriaMetrics\\n- Traces: OpenTelemetry + Tempo, Tail Sampling\\n- Logs: Loki, nur JSON\\n\\n## SLIs\\n- Availability: success_rate p99 pro kritischem Endpoint\\n- Latenz: p95/p99 pro Endpoint und Tenant\\n- Saturation: Queue, CPU/Mem vs Requests/Limits\\n- Business: Checkout-Erfolg, Payment-Auth-Rate\\n\\n## SLO-Workflow\\n1) User Journey und Error Budget mit Product definieren.\\n2) SLIs (Golden Signals + Business) anschließen.\\n3) Alerts auf Burn Rate, nicht auf einzelne Spikes.\\n4) Wöchentliches SLO-Review, Ownership rotieren.\\n\\n## Runbooks\\n- Jeder Alert hat ein Runbook: Owner, Schritte, Rollback, Kommunikation.\\n- Chaos-Drills in Staging, On-Call-Übungen quartalsweise.\\n\\n## Kostenbewusst\\n- Laute Logs am Rand aggregieren/filtern.\\n- Tail Sampling für Traces, 100% für Errors.\\n- Kardinalität begrenzen (Tenant, Routen-Templates).\\n\\n## Ergebnisse\\n- P99 Checkout -22%\\n- On-Call Pages/Woche -40%\\n- Neuer Service mit Dashboards in < 1 Tag",
+    "content_blocks": [
+      { "type": "hero", "cover": "/images/404.jpg", "kpi": "22% p99 besser" },
+      { "type": "stack", "items": ["OpenTelemetry", "Tempo", "Loki", "Prometheus", "Grafana"] },
+      { "type": "metrics", "items": [
+        { "label": "P99 Checkout", "value": "-22%" },
+        { "label": "Pages/Woche", "value": "-40%" },
+        { "label": "Dashboards", "value": "<1 Tag" }
+      ]}
+    ],
+    "excerpt": "Wie wir Tracing, Metriken und Logs von Anfang an einbauen und Releases sicher machen.",
+    "cover_image": "/images/404.jpg",
+    "og_image": "/images/404.jpg",
+    "tags": ["observability", "sre", "otel", "slo", "grafana"],
+    "language": "de",
+    "status": "published",
+    "is_featured": true,
+    "reading_time": 9,
+    "meta_title": "Observability ab Tag 1: sicher liefern",
+    "meta_description": "SLIs/SLOs und kosteneffizientes Monitoring, mit denen wir Plattformen sicher ausrollen.",
+    "canonical_url": null,
+    "published_at": "2024-11-12T00:00:00Z",
+    "author": "Automaton Soft"
   }
 ]

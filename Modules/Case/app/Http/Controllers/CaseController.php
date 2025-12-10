@@ -12,7 +12,8 @@ class CaseController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = CaseModel::query();
+        $lang = $this->resolveLanguage($request);
+        $query = CaseModel::query()->where('language', $lang);
 
         if ($category = $request->query('category')) {
             $query->where('category', $category);
@@ -41,9 +42,14 @@ class CaseController extends Controller
         ]);
     }
 
-    public function show(string $slug): JsonResponse
+    public function show(string $slug, Request $request): JsonResponse
     {
-        $item = CaseModel::where('slug', $slug)->first();
+        $lang = $this->resolveLanguage($request);
+        $item = CaseModel::where('slug', $slug)->where('language', $lang)->first();
+
+        if (!$item && $lang !== 'en') {
+            $item = CaseModel::where('slug', $slug)->where('language', 'en')->first();
+        }
 
         if (!$item) {
             return response()->json(['message' => 'Case not found'], 404);
@@ -64,24 +70,27 @@ class CaseController extends Controller
             'status' => 'nullable|string',
             'type' => 'nullable|string',
             'slug' => 'nullable|string',
+            'language' => 'nullable|string|in:en,de',
         ]);
 
         $slug = $data['slug'] ?? Str::slug($data['property_title'] . '-' . Str::random(4));
+        $language = $data['language'] ?? 'en';
 
-        if (CaseModel::where('slug', $slug)->exists()) {
-            return response()->json(['message' => 'Slug already exists'], 422);
+        if (CaseModel::where('slug', $slug)->where('language', $language)->exists()) {
+            return response()->json(['message' => 'Slug already exists for this language'], 422);
         }
 
         $case = CaseModel::create(array_merge([
             'property_price' => $data['property_price'] ?? 'In production',
-        ], $data, ['slug' => $slug]));
+        ], $data, ['slug' => $slug, 'language' => $language]));
 
         return response()->json(['data' => $case], 201);
     }
 
     public function update(Request $request, string $slug): JsonResponse
     {
-        $case = CaseModel::where('slug', $slug)->first();
+        $lang = $this->resolveLanguage($request);
+        $case = CaseModel::where('slug', $slug)->where('language', $lang)->first();
 
         if (!$case) {
             return response()->json(['message' => 'Case not found'], 404);
@@ -108,5 +117,20 @@ class CaseController extends Controller
 
         $case->delete();
         return response()->json(['message' => 'Case deleted']);
+    }
+
+    private function resolveLanguage(Request $request): string
+    {
+        $lang = $request->query('lang')
+            ?? $request->header('X-Lang')
+            ?? $request->header('Accept-Language');
+
+        if (is_string($lang) && strlen($lang) >= 2) {
+            $lang = substr($lang, 0, 2);
+        } else {
+            $lang = 'en';
+        }
+
+        return in_array($lang, ['en', 'de']) ? $lang : 'en';
     }
 }
