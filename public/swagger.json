@@ -412,7 +412,7 @@
         "properties": {
           "id": { "type": "string" },
           "property_title": { "type": "string" },
-          "property_img": { "type": "string" },
+          "cover_image": { "type": "string" },
           "property_price": { "type": "string" },
           "category": { "type": "string" },
           "location": { "type": "string" },
@@ -428,7 +428,6 @@
         "type": "object",
         "properties": {
           "property_title": { "type": "string" },
-          "property_img": { "type": "string" },
           "category": { "type": "string" },
           "location": { "type": "string" },
           "livingArea": { "type": "string" },
@@ -443,7 +442,6 @@
         "type": "object",
         "properties": {
           "property_title": { "type": "string" },
-          "property_img": { "type": "string" },
           "property_price": { "type": "string" },
           "category": { "type": "string" },
           "location": { "type": "string" },

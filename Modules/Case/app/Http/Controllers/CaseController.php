@@ -41,13 +41,24 @@ class CaseController extends Controller
             $translation = $case->translations->firstWhere('lang', $lang)
                 ?? $case->translations->firstWhere('lang', $fallbackLang);
 
+            $title = $translation->title ?? $translation->property_title ?? $case->title ?? $case->property_title;
+            $domain = $translation->domain ?? $translation->property_price ?? $case->domain ?? $case->property_price;
+            $summary = $translation->summary ?? $translation->livingArea ?? $case->summary ?? $case->livingArea;
+            $cover = $translation->cover_image ?? $case->cover_image;
+
             return array_merge($case->toArray(), [
                 'lang' => $translation->lang ?? $case->language ?? $fallbackLang,
                 'slug' => $translation->slug ?? $case->slug,
-                'property_title' => $translation->property_title ?? $case->property_title,
-                'property_price' => $translation->property_price ?? $case->property_price,
+                // new names
+                'title' => $title,
+                'domain' => $domain,
+                'summary' => $summary,
+                'cover_image' => $cover,
+                // legacy keys for compatibility
+                'property_title' => $title,
+                'property_price' => $domain,
+                'livingArea' => $summary,
                 'location' => $translation->location ?? $case->location,
-                'livingArea' => $translation->livingArea ?? $case->livingArea,
                 'tag' => $translation->tag ?? $case->tag,
                 'status' => $translation->status ?? $case->status,
                 'type' => $translation->type ?? $case->type,
@@ -83,14 +94,23 @@ class CaseController extends Controller
 
         if ($translation && $translation->case) {
             $case = $translation->case;
+            $title = $translation->title ?? $translation->property_title ?? $case->title ?? $case->property_title;
+            $domain = $translation->domain ?? $translation->property_price ?? $case->domain ?? $case->property_price;
+            $summary = $translation->summary ?? $translation->livingArea ?? $case->summary ?? $case->livingArea;
+            $cover = $translation->cover_image ?? $case->cover_image;
+
             return response()->json([
                 'data' => array_merge($case->toArray(), [
                     'lang' => $translation->lang,
                     'slug' => $translation->slug,
-                    'property_title' => $translation->property_title,
-                    'property_price' => $translation->property_price,
+                    'title' => $title,
+                    'domain' => $domain,
+                    'summary' => $summary,
+                    'cover_image' => $cover,
+                    'property_title' => $title,
+                    'property_price' => $domain,
+                    'livingArea' => $summary,
                     'location' => $translation->location,
-                    'livingArea' => $translation->livingArea,
                     'tag' => $translation->tag,
                     'status' => $translation->status,
                     'type' => $translation->type,
@@ -111,31 +131,39 @@ class CaseController extends Controller
     {
         $data = $request->validate([
             'slug' => 'nullable|string',
-            'property_img' => 'nullable|string',
+            'cover_image' => 'nullable|string',
             'category' => 'nullable|string',
             'type' => 'nullable|string',
             'translations' => 'required|array',
             'translations.*.lang' => 'required|string|in:en,de',
-            'translations.*.property_title' => 'required|string',
+            'translations.*.title' => 'required_without:translations.*.property_title|string|nullable',
+            'translations.*.property_title' => 'nullable|string',
             'translations.*.slug' => 'nullable|string',
+            'translations.*.domain' => 'nullable|string',
             'translations.*.property_price' => 'nullable|string',
             'translations.*.location' => 'nullable|string',
+            'translations.*.summary' => 'nullable|string',
             'translations.*.livingArea' => 'nullable|string',
             'translations.*.tag' => 'nullable|string',
             'translations.*.status' => 'nullable|string',
             'translations.*.type' => 'nullable|string',
+            'translations.*.cover_image' => 'nullable|string',
         ]);
 
         $translations = $data['translations'];
-        $baseSlug = $data['slug'] ?? Str::slug(($translations[0]['property_title'] ?? 'case') . '-' . Str::random(4));
+        $baseTitle = $translations[0]['title'] ?? $translations[0]['property_title'] ?? 'case';
+        $baseSlug = $data['slug'] ?? Str::slug($baseTitle . '-' . Str::random(4));
 
         $case = CaseModel::create([
-            'property_title' => $translations[0]['property_title'],
-            'property_img' => $data['property_img'] ?? null,
-            'property_price' => $translations[0]['property_price'] ?? null,
+            'title' => $translations[0]['title'] ?? $translations[0]['property_title'] ?? null,
+            'property_title' => $translations[0]['title'] ?? $translations[0]['property_title'] ?? null,
+            'cover_image' => $data['cover_image'] ?? null,
+            'domain' => $translations[0]['domain'] ?? $translations[0]['property_price'] ?? null,
+            'property_price' => $translations[0]['domain'] ?? $translations[0]['property_price'] ?? null,
             'category' => $data['category'] ?? null,
             'location' => $translations[0]['location'] ?? null,
-            'livingArea' => $translations[0]['livingArea'] ?? null,
+            'summary' => $translations[0]['summary'] ?? $translations[0]['livingArea'] ?? null,
+            'livingArea' => $translations[0]['summary'] ?? $translations[0]['livingArea'] ?? null,
             'tag' => $translations[0]['tag'] ?? null,
             'status' => $translations[0]['status'] ?? null,
             'type' => $translations[0]['type'] ?? $data['type'] ?? null,
@@ -146,18 +174,26 @@ class CaseController extends Controller
         foreach ($translations as $translation) {
             $langCode = $this->normalizeLanguage($translation['lang']);
             $tSlug = $translation['slug'] ?? $baseSlug;
+            $tTitle = $translation['title'] ?? $translation['property_title'] ?? $case->title;
+            $tDomain = $translation['domain'] ?? $translation['property_price'] ?? $case->domain;
+            $tSummary = $translation['summary'] ?? $translation['livingArea'] ?? $case->summary;
+            $tCover = $translation['cover_image'] ?? $case->cover_image;
 
             CaseTranslation::create([
                 'case_id' => $case->id,
                 'lang' => $langCode,
                 'slug' => $tSlug,
-                'property_title' => $translation['property_title'] ?? $case->property_title,
-                'property_price' => $translation['property_price'] ?? $case->property_price,
+                'title' => $tTitle,
+                'property_title' => $tTitle,
+                'domain' => $tDomain,
+                'property_price' => $tDomain,
                 'location' => $translation['location'] ?? $case->location,
-                'livingArea' => $translation['livingArea'] ?? $case->livingArea,
+                'summary' => $tSummary,
+                'livingArea' => $tSummary,
                 'tag' => $translation['tag'] ?? $case->tag,
                 'status' => $translation['status'] ?? $case->status,
                 'type' => $translation['type'] ?? $case->type,
+                'cover_image' => $tCover,
             ]);
         }
 
@@ -175,13 +211,18 @@ class CaseController extends Controller
         }
 
         $basePayload = $request->only([
-            'property_img', 'category', 'type',
+            'cover_image', 'category', 'type',
         ]);
-        $case->fill(array_filter($basePayload, fn($v) => !is_null($v)));
+        $mappedBase = [
+            'cover_image' => $basePayload['cover_image'] ?? null,
+            'category' => $basePayload['category'] ?? null,
+            'type' => $basePayload['type'] ?? null,
+        ];
+        $case->fill(array_filter($mappedBase, fn($v) => !is_null($v)));
         $case->save();
 
         $tPayload = $request->only([
-            'property_title', 'property_price', 'location', 'livingArea', 'tag', 'status', 'type', 'slug'
+            'title', 'property_title', 'domain', 'property_price', 'summary', 'livingArea', 'location', 'tag', 'status', 'type', 'slug', 'cover_image',
         ]);
 
         if (!empty(array_filter($tPayload, fn($v) => !is_null($v)))) {
@@ -191,9 +232,29 @@ class CaseController extends Controller
                     'lang' => $lang,
                 ]);
             }
-            foreach ($tPayload as $key => $value) {
-                if (!is_null($value)) {
-                    $translation->{$key} = $value;
+            $title = $tPayload['title'] ?? $tPayload['property_title'] ?? null;
+            $domain = $tPayload['domain'] ?? $tPayload['property_price'] ?? null;
+            $summary = $tPayload['summary'] ?? $tPayload['livingArea'] ?? null;
+            $cover = $tPayload['cover_image'] ?? null;
+
+            if ($title !== null) {
+                $translation->title = $title;
+                $translation->property_title = $title;
+            }
+            if ($domain !== null) {
+                $translation->domain = $domain;
+                $translation->property_price = $domain;
+            }
+            if ($summary !== null) {
+                $translation->summary = $summary;
+                $translation->livingArea = $summary;
+            }
+            if ($cover !== null) {
+                $translation->cover_image = $cover;
+            }
+            foreach (['location', 'tag', 'status', 'type', 'slug'] as $key) {
+                if (!is_null($tPayload[$key] ?? null)) {
+                    $translation->{$key} = $tPayload[$key];
                 }
             }
             if (!$translation->slug) {

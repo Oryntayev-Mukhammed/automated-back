@@ -5,16 +5,20 @@ namespace Modules\Case\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Orchid\Screen\AsSource;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Orchid\Attachment\Attachable;
 
 class CaseModel extends Model
 {
-    use AsSource;
+    use AsSource, Attachable;
 
     protected $table = 'cases';
 
     protected $fillable = [
+        'title',
+        'cover_image',
+        'domain',
+        'summary',
         'property_title',
-        'property_img',
         'property_price',
         'category',
         'location',
