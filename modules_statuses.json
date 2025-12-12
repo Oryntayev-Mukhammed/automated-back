@@ -1,5 +1,6 @@
 {
     "Case": true,
     "Blog": true,
-    "I18n": true
+    "I18n": true,
+    "Contact": true
 }

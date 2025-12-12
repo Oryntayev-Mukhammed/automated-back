@@ -135,9 +135,25 @@ class CaseEditScreen extends Screen
             }
         }
 
+        $translations = $validated['translations'] ?? [];
+        // Ensure required base title/property_title for DB not-null constraints
+        $primaryTitle = $translations['en']['title'] ?? $translations['en']['property_title'] ?? null;
+        if (!$case->property_title && $primaryTitle) {
+            $case->property_title = $primaryTitle;
+        }
+        if (!$case->title && $primaryTitle) {
+            $case->title = $primaryTitle;
+        }
+        // Fallback slug/language with uniqueness
+        $langBase = $case->language ?? 'en';
+        $baseSlug = $case->slug ?: ($primaryTitle ? Str::slug($primaryTitle) : null);
+        $case->language = $langBase;
+        if ($baseSlug) {
+            $case->slug = $this->uniqueCaseSlug($baseSlug, $langBase, $case->id);
+        }
+
         $case->save();
 
-        $translations = $validated['translations'] ?? [];
         foreach (['en', 'de'] as $lang) {
             $tData = $translations[$lang] ?? [];
             $title = $tData['title'] ?? $tData['property_title'] ?? null;
@@ -173,5 +189,18 @@ class CaseEditScreen extends Screen
     {
         $case->delete();
         Alert::info('Case deleted');
+    }
+
+    private function uniqueCaseSlug(string $baseSlug, string $lang, ?int $ignoreId = null): string
+    {
+        $slug = $baseSlug;
+        $counter = 1;
+        while (CaseModel::where('slug', $slug)->where('language', $lang)
+            ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
+            ->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+        return $slug;
     }
 }

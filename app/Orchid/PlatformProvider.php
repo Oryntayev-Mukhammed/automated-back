@@ -48,6 +48,10 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.posts')
                 ->divider(),
 
+            Menu::make('Contacts')
+                ->icon('bs.envelope')
+                ->route('platform.contact.list'),
+
             Menu::make(__('Users'))
                 ->icon('bs.people')
                 ->route('platform.systems.users')

@@ -135,10 +135,18 @@ class PostEditScreen extends Screen
             $baseData['tags'] = array_values(array_filter(array_map('trim', explode(',', $baseData['tags']))));
         }
 
+        $translations = $validated['translations'] ?? [];
+        $primaryTitle = $translations['en']['title'] ?? null;
+        // Ensure base title/slug before save (posts table has NOT NULL + unique slug)
+        if ($primaryTitle) {
+            $post->title = $primaryTitle;
+            $baseSlug = $post->slug ?: Str::slug($primaryTitle);
+            $post->slug = $this->uniquePostSlug($baseSlug, $post->id);
+        }
+
         $post->fill($baseData);
         $post->save();
 
-        $translations = $validated['translations'] ?? [];
         foreach (['en', 'de'] as $lang) {
             $tData = $translations[$lang] ?? [];
             if (empty($tData['title'])) {
@@ -168,5 +176,18 @@ class PostEditScreen extends Screen
     {
         $post->delete();
         Alert::info('Post deleted');
+    }
+
+    private function uniquePostSlug(string $baseSlug, ?int $ignoreId = null): string
+    {
+        $slug = $baseSlug;
+        $counter = 1;
+        while (Post::where('slug', $slug)
+            ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
+            ->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+        return $slug;
     }
 }

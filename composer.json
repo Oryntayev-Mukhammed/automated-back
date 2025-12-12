@@ -28,7 +28,8 @@
         "Database\\Seeders\\": "database/seeders/",
         "Modules\\Case\\": "Modules/Case/app/",
         "Modules\\Blog\\": "Modules/Blog/app/",
-        "Modules\\I18n\\": "Modules/I18n/app/"
+        "Modules\\I18n\\": "Modules/I18n/app/",
+        "Modules\\Contact\\": "Modules/Contact/app/"
     },
         "classmap": [
             "Modules/Case/database/seeders",

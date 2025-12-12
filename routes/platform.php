@@ -15,6 +15,7 @@ use App\Orchid\Screens\Case\CaseEditScreen;
 use App\Orchid\Screens\Case\CaseListScreen;
 use App\Orchid\Screens\Blog\PostEditScreen;
 use App\Orchid\Screens\Blog\PostListScreen;
+use App\Orchid\Screens\Contact\ContactListScreen;
 use App\Orchid\Screens\PlatformScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
@@ -132,3 +133,8 @@ Route::screen('posts/create', PostEditScreen::class)
 Route::screen('posts/{post}/edit', PostEditScreen::class)
     ->name('platform.posts.edit')
     ->breadcrumbs(fn (Trail $trail, $post) => $trail->parent('platform.posts')->push($post->title));
+
+// Contacts
+Route::screen('contact-submissions', ContactListScreen::class)
+    ->name('platform.contact.list')
+    ->breadcrumbs(fn (Trail $trail) => $trail->parent('platform.index')->push('Contacts'));
